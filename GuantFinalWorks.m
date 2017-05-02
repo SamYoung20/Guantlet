@@ -1,9 +1,9 @@
 function out = GuantFinalWorks()
 clear
-% pub = rospublisher('/raw_vel');
-% sub = rossubscriber('/encoders');
-% msg = rosmessage(pub);
-% sub_bump = rossubscriber('/bump');
+pub = rospublisher('/raw_vel');
+sub = rossubscriber('/encoders');
+msg = rosmessage(pub);
+sub_bump = rossubscriber('/bump');
 hold on
 Xwall = 3.378;
 Ywall = 2.159;
@@ -26,7 +26,6 @@ grad = findGrad(x(1),x(2))
 % Define the function
 % Test at the initial point
 d = .25; % meters
-%x = [4; 1]; % beginning point
 phi = 0; % radians
 lambda = 2; % step size
 delta = .93; % change in step size
@@ -36,19 +35,18 @@ vlr = -(w*d)/2; % left wheel speed (meters/second)
 vrr = (w*d)/2; % right wheel speed (meters/second)
 y = 0; % for while loop
 
-%    bumpMessage = receive(sub_bump);
-%     if any(bumpMessage.Data)
-%         msg.Data=[0,0];
-%         send(pub, msg);
-%     end
+   bumpMessage = receive(sub_bump);
+    if any(bumpMessage.Data)
+        msg.Data=[0,0];
+        send(pub, msg);
+    end
 while grad(1)< 3
-%     bumpMessage = receive(sub_bump);
-%     if any(bumpMessage.Data)
-%         msg.Data=[0,0];
-%         send(pub, msg);
-%         break;
-%     end
-    %gradient = Gradient(x); % creates gradient from initial point
+    bumpMessage = receive(sub_bump);
+    if any(bumpMessage.Data)
+        msg.Data=[0,0];
+        send(pub, msg);
+        break;
+    end
     
     shift = lambda.*grad; % multiplies step size by gradient
     leng = norm(shift) % gives length of resulting vector
@@ -77,31 +75,31 @@ while grad(1)< 3
         Vrr = vrr;
     end
 % 
-%     msg.Data = [Vlr, Vrr];
-%     send(pub, msg);
-% 
-%     pause(turn_time)
-% 
-%     msg.Data=[0,0];
-%     send(pub, msg);
-% 
-%     vl = vel;
-%     vr = vel;
-%     msg.Data = [vl, vr];
-% 
-%     send(pub, msg);
-%     pause(movetime)
-%     
-%     msg.Data=[0,0];
-%     send(pub, msg);
-%     pause(.5)
+    msg.Data = [Vlr, Vrr];
+    send(pub, msg);
+
+    pause(turn_time)
+
+    msg.Data=[0,0];
+    send(pub, msg);
+
+    vl = vel;
+    vr = vel;
+    msg.Data = [vl, vr];
+
+    send(pub, msg);
+    pause(movetime)
+    
+    msg.Data=[0,0];
+    send(pub, msg);
+    pause(.5)
 
     phi = theta; % updates current angle
     grad = findGrad(x(1),x(2))
 end    
 
-% msg.Data = [0, 0];
-% send(pub, msg);
+msg.Data = [0, 0];
+send(pub, msg);
 
 function grad = findGrad(x1,y1)
     x1 =[x1,y1]
@@ -169,11 +167,6 @@ function grad = findGrad(x1,y1)
         end
     end
     %%
-
-    %%
-    % Cpoint = -20;
-    % point1 =  1./sqrt((px-(2.8194)).^2 + ((py-1.397)).^2)
-    % V = Cpoint* point1
     V;
     [Ex, Ey] = gradient(V);
     Gradient = [-Ex(4,4); -Ey(4,4)];
